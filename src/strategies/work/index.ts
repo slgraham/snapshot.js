@@ -2,12 +2,12 @@ import { formatUnits } from '@ethersproject/units';
 import Multicaller from '../../utils/multicaller';
 
 export const author = 'bonustrack';
-export const version = '0.1.0';
+export const version = '0.2.0';
 
 const abi = [
   {
     inputs: [{ internalType: 'address', name: '_address', type: 'address' }],
-    name: 'isWhitelisted',
+    name: 'isEmployeeMember',
     outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
     stateMutability: 'view',
     type: 'function'
@@ -32,7 +32,7 @@ export async function strategy(
   const blockTag = typeof snapshot === 'number' ? snapshot : 'latest';
   const multi = new Multicaller(network, provider, abi, { blockTag });
   addresses.forEach((address) => {
-    multi.call(`${address}.isWhitelisted`, options.whitelist, 'isWhitelisted', [
+    multi.call(`${address}.isEmployeeMember`, options.whitelist, 'isEmployeeMember', [
       address
     ]);
     multi.call(`${address}.stake`, options.stake, 'stakes', [address]);
@@ -43,7 +43,7 @@ export async function strategy(
       const stake = parseFloat(
         formatUnits(result[address].stake.toString(), options.decimals)
       );
-      return [address, result[address].isWhitelisted ? stake : 0];
+      return [address, result[address].isEmployeeMember ? Math.sqrt(stake) + 1 : 0];
     })
   );
 }
